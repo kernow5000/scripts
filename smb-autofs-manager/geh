@@ -1,0 +1,9 @@
+I need to parse the smbtree output , and make sure my parser works on every
+smbtree output every time, so its consistent.
+
+Will the script be dependant on my automounter
+config style? 
+
+who knows, lets try not to make that the case.
+
+-N works for no password needed which is good.

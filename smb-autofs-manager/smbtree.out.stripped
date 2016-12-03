@@ -1,0 +1,21 @@
+	\\FORTBUCHE      		
+		\\FORTBUCHE\Games Stuff    	
+		\\FORTBUCHE\C$             	Default share
+		\\FORTBUCHE\ADMIN$         	Remote Admin
+		\\FORTBUCHE\Mp3s           	
+		\\FORTBUCHE\dump           	
+		\\FORTBUCHE\Apps           	
+		\\FORTBUCHE\D$             	Default share
+		\\FORTBUCHE\IPC$           	Remote IPC
+		\\FORTBUCHE\E$             	Default share
+		\\FORTBUCHE\Drivers        	
+	\\BOTTLENECK     		Linux Box
+		\\BOTTLENECK\ADMIN$         	IPC Service (Linux Box)
+		\\BOTTLENECK\IPC$           	IPC Service (Linux Box)
+		\\BOTTLENECK\burnme         	dump shit for burning here
+		\\BOTTLENECK\buche          	buche dir on the webserver
+		\\BOTTLENECK\kernow         	kernow dir on the webserver
+		\\BOTTLENECK\dump           	dump 'ere
+		\\BOTTLENECK\mp3            	tunes
+		\\BOTTLENECK\cdrw           	
+		\\BOTTLENECK\cdrom          	

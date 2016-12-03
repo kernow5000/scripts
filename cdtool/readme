@@ -1,0 +1,45 @@
+rip.sh v0.1
+kernow 2004 (kernow@stalemeat.net)
+==================================
+
+Firstly, thanks for having some faith in me and downloading this script.
+Its a pity it only runs as UID 0 at present but I promise it does nothing nasty to your system.
+
+I created this script mainly for something to do, and also because I needed a simple tool to rip whole audioCDs to mp3 format in a quick and dirty fashion :)
+
+
+Usage Information:
+==================
+
+It is vital you have the following binaries in your $PATH.
+
+	cdparanoia (www.xiph.org)
+	lame       (www.lame.net)
+	id3tag (not supported yet, but in later versions) (www.id3tag.org.uk)
+	
+(put the correct bloody binary names here)
+
+
+Executing rip.sh from the shell with no command line arguments will cause it to run it 'default' mode, below are the following settings for default ripping mode.
+
+	Default device for cdparanoia to use: 		/dev/cdrom
+	Default bitrate for LAME to use: 		192kbit
+	Default output directory for mp3 files: 	./mp3/
+	Default prefix for mp3 filenames:		track-
+	Eject CD when operation is complete:		NO
+	
+Running rip.sh with -h or --help switches will show all available command switches and defaults.
+
+Using rip.sh in default mode is the most convenient method of ripping whole cd's as you merely put an audioCD in and run the script with no switches. However, if you like more control, and lets be honest thats likely else you wouldn't be here, use of command line switches is preferred. You can always alias it, or use another wrapper script :)
+
+
+
+
+Whats coming in future versions
+===============================
+Checking binaries exist in path.
+ID3 Tag support.
+The ability to specify a single track to rip and encode.
+More error handling.
+
+kernow@stalemeat.net

@@ -1,0 +1,13 @@
+kernel            -ro,soft,intr           ftp.kernel.org:/pub/linux
+cdrw              -fstype=iso9660,ro,user                            :/dev/cdrom
+cdrom		  -fstype=iso9660,ro,user			     :/dev/sr0
+floppy            -fstype=vfat,sync,defaults,umask=000,user	     :/dev/fd0
+e2_floppy	  -fstype=ext2,sync,defaults,user		     :/dev/fd0
+stick		  -fstype=vfat,sync,defaults,umask=000,user	     :/dev/usb/stick
+sync		  -fstype=ext3,sync,defaults			     :/dev/hdb1
+ipod		  -fstype=vfat,sync,defaults,umask=000,user	     :/dev/ipod2
+fortbuche_dump -fstype=smbfs,username=kernow,password=	     ://fortbuche/dump
+fortbuche_mp3s -fstype=smbfs,username=kernow,password=	     ://fortbuche/Mp3s
+bottleneck_dump -fstype=smbfs,username=kernow,password=	     ://192.168.0.115/dump
+server_dump -fstype=smbfs,username=kernow,password=	     ://server/tmp
+bottleneck_http   -fstype=smbfs,username=kernow,password=    ://bottleneck/kernow

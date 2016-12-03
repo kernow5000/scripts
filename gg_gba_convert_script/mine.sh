@@ -1,0 +1,273 @@
+############################################################################
+#    Copyright (C) 2004 by kernow                                          #
+#    kernow@stalemeat.net                                                  #
+#                                                                          #
+#    This program is free software; you can redistribute it and#or modify  #
+#    it under the terms of the GNU General Public License as published by  #
+#    the Free Software Foundation; either version 2 of the License, or     #
+#    (at your option) any later version.                                   #
+#                                                                          #
+#    This program is distributed in the hope that it will be useful,       #
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
+#    GNU General Public License for more details.                          #
+#                                                                          #
+#    You should have received a copy of the GNU General Public License     #
+#    along with this program; if not, write to the                         #
+#    Free Software Foundation, Inc.,                                       #
+#    59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             #
+############################################################################
+
+#!/bin/sh
+
+VERSION="0.21a"
+
+
+# this will be shown on running the script with -h for help
+function print_info()
+{
+echo "$(basename $0) $VERSION"
+echo "============"
+echo "Copyright (C) 2004 by kernow <kernow@stalemeat.net>"
+echo "This is free software, and you are welcome to redistribute it under"
+echo "the conditions of the GNU General Public License."
+echo
+echo "Usage:"
+echo "$(basename $0)"
+echo "$(basename $0) [options]"
+echo
+echo -e "Options:"
+echo -e "-i <PCXfile> \tUse this PCX as an input file"
+echo -e "-od <object> \tUse this for the data ELF object name (optional)"
+echo -e "-op <object> \tUse this for the palette ELF object name (optional)"
+echo -e "-t <tilesize>\tUse this for the tilesize (default is 8)"
+echo -e "-c <depth> \tUse this for the colour depth (default is 256)"
+echo -e "-d <dir>\tUse this for the output directory (default is .)"
+echo -e "-u\t\tDon't clean up temporary files when finished."
+echo -e "-h or --help \tDisplay this help."
+echo -e "-v \t\tDisplay script version."
+echo
+}
+# add the proper options obviously
+
+
+
+# setup some defaults
+PALETTE=""
+INPUTPCX=""
+COLOURDEPTH="256"
+CLEANUP="YES"
+
+OUTPUTDIR=""
+
+# use a default tilesize of 8
+TILESIZE="8"
+# end of defaults for now
+
+
+# now, get some values from command line arguments, 
+while test $# -gt 0; do
+	if test "$1" = "-h" -o "$1" = "--help"; then
+		print_info
+		exit 1
+	
+	# version 
+	elif test "$1" = "-v"; then
+	  echo $(basename $0) v$VERSION
+	  echo "by kernow, 2004 (kernow@stalemeat.net)"
+	  exit 1
+	  
+
+        # data object
+	elif test "$1" = "-od"; then
+	  test -z "$2"
+	  if [ $? = "0" ]; then
+	    echo "No data object name specified."
+	    exit 1
+	  else 
+	    DATA_OBJ=$2
+	    #echo "Data object name is set to $DATA_OBJ"
+	  fi
+	shift
+
+       
+        # palette object
+	elif test "$1" = "-op"; then
+	  test -z "$2"
+	  if [ $? = "0" ]; then
+	    echo "No palette object name specified."
+	    exit 1
+	  else
+	    PAL_OBJ=$2
+	    #echo "Palette object name is set to $PAL_OBJ"
+	  fi
+	shift
+	  
+
+        # tilesize
+	elif test "$1" = "-t"; then
+	 test -z "$2"
+	 if [ $? = "0" ]; then
+	   echo "No tilesize specified."
+	   exit 1
+	 else if [ "$2" -eq 8 -o "$2" -eq 16 ]; then
+	   TILESIZE=$2
+	   #echo "Valid tilesize given, it is $TILESIZE"
+	 else 
+	   echo "Invalid tilesize specified, must be 8 or 16."
+	   exit 1
+	 fi 
+	 fi
+        shift
+	
+	# colour depth of pcx file?
+	elif test "$1" = "-c"; then
+	 test -z "$2"
+	 if [ $? = "0" ]; then
+	   echo "No colour depth specified."
+	   exit 1
+	 else if [ "$2" -eq 16 -o "$2" -eq 256 ]; then
+	   COLOURDEPTH=$2
+	   #echo "Valid colour depth given, it is $COLOURDEPTH"
+	 else 
+	   echo "Invalid colour depth specified, must be 16 or 256."
+	   exit 1
+	 fi 
+	 fi
+        shift
+
+        
+	# output directory, this needs work
+	# because of -u for unclean
+	elif test $1 = "-d"; then
+	 test -z "$2"
+        if [ $? = "0" ]; then
+	   echo "No output directory specified."
+	   exit 1
+	 else 
+	   OUTPUTDIR=$2
+	   echo "OUTPUTDIR file specified, it is $OUTPUTDIR"
+	   # check if it exists - validate
+	   test -e $OUTPUTDIR
+	   if [ $? = "1" ]; then
+	   mkdir $OUTPUTDIR
+	   fi  
+	 fi
+	 shift
+
+	
+
+	# pcx input file
+	elif test $1 = "-i"; then
+	 test -z "$2"
+	 if [ $? = "0" ]; then
+	   echo "No input PCX file specified."
+	   exit 1
+	 else 
+	   INPUTPCX=$2
+	   #echo "PCX file specified, it is $INPUTPCX"
+	 fi
+	 shift
+
+        
+	# delete and clean up afterwards?
+	elif test $1 = "-u"; then
+	CLEANUP="NO"
+	shift
+       
+	
+	# default response for illegal switch
+	else
+		echo "Invalid parameter: $1"
+		echo "Try $0 -h for help."
+		echo
+		exit 1
+	fi
+	
+	shift
+done
+
+
+
+# this rips off the extension and replaces with .raw
+IFS="."
+for i in $INPUTPCX; do if [ $i != "." ]; then break; fi ;  done
+RAWFILE=$i.raw
+IFS=""
+#echo $RAWFILE
+# done
+
+
+# construct a suitable name for the data
+DATA=$(echo -n $i ; echo _data)
+PALDATA=$(echo -n $i ; echo _pal)
+#echo $DATA
+#echo $PALDATA
+  
+
+
+# so, test the variables and act accordingly
+test -z "$INPUTPCX"
+if [ $? = "0" ]; then
+  print_info
+  exit 1
+else
+  test -z "$COLOURDEPTH"
+  if [ $? = "0" ]; then
+    echo "No colour depth specified."
+    exit 1
+
+else
+  test -z "$PALETTE"
+  if [ $? = "0" ]; then
+    #echo "No palette specified, defaulting to $INPUTPCX.pal"
+    PALETTE=$i.pal
+  fi
+fi  
+  
+   
+  test -z "$DATA_OBJ"
+  if [ $? = "0" ]; then
+    #echo "building a prefix for the object name"
+    DATA_OBJ=$i-lz77.o
+    #echo $DATA_OBJ
+  fi
+  
+  test -z "$PAL_OBJ"
+  if [ $? = "0" ]; then
+    #echo "building a prefix for the object name"
+    PAL_OBJ=$PALDATA.o
+    #echo $PAL_OBJ
+  fi
+  
+  
+  echo "output directory is $OUTPUTDIR"
+  
+  echo ./gfx2gba-static -p $PALETTE -t $TILESIZE -c $COLOURDEPTH $INPUTPCX
+  echo wine GBACrusherCL.exe -LV $RAWFILE -O $i-lz77.bin
+  echo bin2o $i-lz77.bin $DATA_OBJ +$DATA
+  echo bin2o $PALETTE $PAL_OBJ +$PALDATA
+  
+
+fi
+
+
+# mv object files if need be
+test -z "$OUTPUTDIR"
+if [ $? = "1" ]; then
+echo "moving object files to $OUTPUTDIR"
+mv $DATA_OBJ $PAL_OBJ $OUTPUTDIR
+fi
+
+
+# finally, cleanup..
+if [ $CLEANUP = "YES" ]; then
+ echo "Cleaning up all temporary files."
+ rm *.raw *.bin *.pal -rf
+fi
+
+
+
+
+# end of file/script
+# kernow 2004
