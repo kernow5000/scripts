@@ -20,10 +20,8 @@
 
 #!/bin/sh
 
-VERSION="0.2"
+VERSION="0.21a"
 
-
-# needs -d for output directory
 
 # this will be shown on running the script with -h for help
 function print_info()
@@ -55,7 +53,6 @@ echo
 
 
 # setup some defaults
-
 PALETTE=""
 INPUTPCX=""
 COLOURDEPTH="256"
@@ -65,7 +62,6 @@ OUTPUTDIR=""
 
 # use a default tilesize of 8
 TILESIZE="8"
-
 # end of defaults for now
 
 
@@ -141,17 +137,17 @@ while test $# -gt 0; do
         shift
 
         
-	# output directory
-	elif test "$1" = "-d"; then
+	# output directory, this needs work
+	# because of -u for unclean
+	elif test $1 = "-d"; then
 	 test -z "$2"
         if [ $? = "0" ]; then
 	   echo "No output directory specified."
 	   exit 1
 	 else 
 	   OUTPUTDIR=$2
-	   #echo "OUTPUTDIR file specified, it is $OUTPUTDIR"
-	   #check if it exists etc - validate
-	   # check outputdir dont exist, if it don't - make it
+	   echo "OUTPUTDIR file specified, it is $OUTPUTDIR"
+	   # check if it exists - validate
 	   test -e $OUTPUTDIR
 	   if [ $? = "1" ]; then
 	   mkdir $OUTPUTDIR
@@ -178,7 +174,6 @@ while test $# -gt 0; do
 	elif test $1 = "-u"; then
 	CLEANUP="NO"
 	shift
-	shift
        
 	
 	# default response for illegal switch
@@ -202,16 +197,16 @@ IFS=""
 #echo $RAWFILE
 # done
 
+
 # construct a suitable name for the data
 DATA=$(echo -n $i ; echo _data)
 PALDATA=$(echo -n $i ; echo _pal)
-
 #echo $DATA
 #echo $PALDATA
   
 
 
-# so, test if we are here, by well, if we are here we know basically
+# so, test the variables and act accordingly
 test -z "$INPUTPCX"
 if [ $? = "0" ]; then
   print_info
@@ -246,7 +241,7 @@ fi
   fi
   
   
-  #echo "output directory is $OUTPUTDIR"
+  echo "output directory is $OUTPUTDIR"
   
   echo ./gfx2gba-static -p $PALETTE -t $TILESIZE -c $COLOURDEPTH $INPUTPCX
   echo wine GBACrusherCL.exe -LV $RAWFILE -O $i-lz77.bin
@@ -257,16 +252,11 @@ fi
 fi
 
 
-# mv object files , obviously only if they exist still (CLEANUP=NO)
-
-if [ $CLEANUP = "NO" ]; then
+# mv object files if need be
 test -z "$OUTPUTDIR"
 if [ $? = "1" ]; then
 echo "moving object files to $OUTPUTDIR"
-#mv $DATA_OBJ $PAL_OBJ $OUTPUTDIR
-echo "moving temporary files to $OUTPUTDIR"
-#mv *.raw *.bin *.pal $OUTPUTDIR
-fi
+mv $DATA_OBJ $PAL_OBJ $OUTPUTDIR
 fi
 
 
@@ -274,9 +264,9 @@ fi
 if [ $CLEANUP = "YES" ]; then
  echo "Cleaning up all temporary files."
  rm *.raw *.bin *.pal -rf
- echo "moving object files to $OUTPUTDIR"
- #mv $DATA_OBJ $PAL_OBJ $OUTPUTDIR
 fi
+
+
 
 
 # end of file/script
